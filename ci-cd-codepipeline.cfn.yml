@@ -8,7 +8,7 @@ Parameters:
 
   EksClusterName:
     Type: String
-    Description: TODO - The name of the EKS cluster created
+    Description: eksctl-demo
     Default: eksctl-demo
     MinLength: 1
     MaxLength: 100
@@ -16,7 +16,7 @@ Parameters:
 
   GitSourceRepo:
     Type: String
-    Description: TODO - GitHub source repository - must contain a Dockerfile and buildspec.yml in the base
+    Description: cd0157_Final_Pipeline
     Default: cd0157_Final_Pipeline
     MinLength: 1
     MaxLength: 100
@@ -25,7 +25,7 @@ Parameters:
   GitBranch:
     Type: String
     Default: main
-    Description: TODO - GitHub git repository branch - change triggers a new build
+    Description: main
     MinLength: 1
     MaxLength: 100
     ConstraintDescription: You must enter a GitHub repository branch name
@@ -33,14 +33,14 @@ Parameters:
   GitHubToken:
     Type: String
     NoEcho: true
-    Description: TODO - GitHub API token - see https://github.com/blog/1509-personal-api-tokens
+    Description: github token
     MinLength: 3
     MaxLength: 100
     ConstraintDescription: You must enter a GitHub personal access token
 
   GitHubUser:
     Type: String
-    Default: SudKul
+    Default: AbdullahASCS
     Description: TODO - GitHub username or organization
     MinLength: 3
     MaxLength: 100
@@ -119,6 +119,7 @@ Resources:
         ZipFile: |
           import json
           import boto3
+          import cfnresponse
           from botocore.vendored import requests
           def handler(event, context):
             response = {
@@ -130,7 +131,7 @@ Resources:
               'LogicalResourceId': event['LogicalResourceId'],
               'Data': {"Message": "Resource creation successful!"},
             }
-
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, response, context.log_stream_name)            
             client = boto3.client('iam')
             try:
               if event['RequestType'] == 'Create':
@@ -161,7 +162,7 @@ Resources:
 
       Handler: index.handler
       Role: !GetAtt CustomResourceLambdaExecutionRole.Arn
-      Runtime: python3.7
+      Runtime: python3.12
       Timeout: 300
 
   CustomResourceLambdaExecutionRole:
